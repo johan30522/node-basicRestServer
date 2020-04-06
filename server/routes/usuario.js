@@ -3,8 +3,16 @@ const app = express();
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
+const { verificaToken, verificaAdmin_Role } = require('../middlewares/autentication');
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
+
+
+    return res.json({
+        usuario: req.usuario,
+        nombre: req.usuario.nombre,
+        email: req.usuario.email
+    });
 
     Usuario.find({ estado: true })
         .exec((err, usuariosDB) => {
@@ -19,7 +27,7 @@ app.get('/usuario', function(req, res) {
         })
 })
 
-app.get('/usuario/Paginate', function(req, res) {
+app.get('/usuario/Paginate', verificaToken, (req, res) => {
 
     let desde = req.query.desde || 0;
     let limit = req.query.limit;
@@ -46,7 +54,7 @@ app.get('/usuario/Paginate', function(req, res) {
 
         })
 })
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'role', 'estado']);
 
@@ -68,7 +76,7 @@ app.put('/usuario/:id', function(req, res) {
     console.log(id);
 
 })
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdmin_Role], (req, res) => {
     let body = req.body;
     let usuario = new Usuario({
         nombre: body.nombre,
@@ -90,7 +98,7 @@ app.post('/usuario', function(req, res) {
         })
     })
 })
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
     let id = req.params.id;
     console.log(id);
     Usuario.findOneAndRemove(id, (err, usuarioBorrado) => {
@@ -113,7 +121,7 @@ app.delete('/usuario/:id', function(req, res) {
     })
 
 })
-app.delete('/usuario/deactivate/:id', function(req, res) {
+app.delete('/usuario/deactivate/:id', verificaToken, (req, res) => {
     let id = req.params.id;
 
     Usuario.findByIdAndUpdate(id, { estado: false }, { new: true }, (err, usuarioDB) => {
