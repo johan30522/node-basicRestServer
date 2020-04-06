@@ -8,12 +8,6 @@ const { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticat
 app.get('/usuario', verificaToken, (req, res) => {
 
 
-    return res.json({
-        usuario: req.usuario,
-        nombre: req.usuario.nombre,
-        email: req.usuario.email
-    });
-
     Usuario.find({ estado: true })
         .exec((err, usuariosDB) => {
             if (err) {
