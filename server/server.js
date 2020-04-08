@@ -6,11 +6,17 @@ const mongoose = require('mongoose');
 const app = express();
 
 const bodyParser = require('body-parser');
-
-const cors = require('cors')
+const cors = require('cors');
+const path = require('path');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//habilitar la carpeta public
+console.log(path.resolve(__dirname, '../public'));
+app.use(express.static(path.resolve(__dirname, '../public')));
+
+
 
 // parse application/json
 app.use(bodyParser.json());
